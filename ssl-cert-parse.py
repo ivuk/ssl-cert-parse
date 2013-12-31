@@ -21,6 +21,6 @@ def ParseCert(CertRaw):
     print(str(Cert.get_issuer())[18:-2])
 
 
-CertRaw = GetCert('www.nimium.hr', 443)
+CertRaw = GetCert('some.domain.tld', 443)
 print(CertRaw)
 ParseCert(CertRaw)
