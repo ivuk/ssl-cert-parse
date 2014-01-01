@@ -21,7 +21,7 @@ def ParseCert(CertRaw):
                                              '%Y%m%d%H%M%SZ')
     CertIssuer = str(Cert.get_issuer())[18:-2]
 
-    return {'CertSubject': CertIssuer, 'CertStartDate': CertStartDate,
+    return {'CertSubject': CertSubject, 'CertStartDate': CertStartDate,
             'CertEndDate': CertEndDate, 'CertIssuer': CertIssuer}
 
 
