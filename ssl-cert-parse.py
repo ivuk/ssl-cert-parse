@@ -13,14 +13,23 @@ def GetCert(SiteName, Port):
 def ParseCert(CertRaw):
     Cert = OpenSSL.crypto.load_certificate(
         OpenSSL.crypto.FILETYPE_PEM, CertRaw)
-    print(str(Cert.get_subject())[18:-2])
-    print(datetime.datetime.strptime(str(Cert.get_notBefore())[2:-1],
-          '%Y%m%d%H%M%SZ'))
-    print(datetime.datetime.strptime(str(Cert.get_notAfter())[2:-1],
-          '%Y%m%d%H%M%SZ'))
-    print(str(Cert.get_issuer())[18:-2])
+
+    CertSubject = str(Cert.get_subject())[18:-2]
+    CertStartDate = datetime.datetime.strptime(str(Cert.get_notBefore())[2:-1],
+                                               '%Y%m%d%H%M%SZ')
+    CertEndDate = datetime.datetime.strptime(str(Cert.get_notAfter())[2:-1],
+                                             '%Y%m%d%H%M%SZ')
+    CertIssuer = str(Cert.get_issuer())[18:-2]
+
+    return {'CertSubject': CertIssuer, 'CertStartDate': CertStartDate,
+            'CertEndDate': CertEndDate, 'CertIssuer': CertIssuer}
 
 
 CertRaw = GetCert('some.domain.tld', 443)
+
 print(CertRaw)
-ParseCert(CertRaw)
+
+Out = ParseCert(CertRaw)
+print(Out)
+print(Out['CertSubject'])
+print(Out['CertStartDate'])
