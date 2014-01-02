@@ -42,7 +42,7 @@ def PrintOutData(HostName, Port):
     print('Subject:\t{0}'.format(Out['CertSubject']))
     print('Start date:\t{0}'.format(Out['CertStartDate']))
     print('End date:\t{0}'.format(Out['CertEndDate']))
-    print('Issuer:\t{0}'.format(Out['CertIssuer']))
+    print('Issuer:\t\t{0}'.format(Out['CertIssuer']))
     print('Algorithm:\t{0}'.format(Out['CertSigAlgo']))
     print('Version:\t{0}'.format(Out['CertVersion']))
     if Out['CertExpired']:
