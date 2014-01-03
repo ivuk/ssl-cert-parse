@@ -32,13 +32,34 @@ def ParseCert(CertRaw):
             'CertVersion': CertVersion}
 
 
+def ParseCertExtension(CertRaw):
+    '''Parse the available extension data from the certificate file'''
+    Cert = OpenSSL.crypto.load_certificate(
+        OpenSSL.crypto.FILETYPE_PEM, CertRaw)
+
+    print('Number of extensions:\t{0}'.format(Cert.get_extension_count()))
+
+    ExtNum = 0
+    ExtNameVal = dict()
+
+    while ExtNum < Cert.get_extension_count():
+        ExtName = str(Cert.get_extension(ExtNum).get_short_name())[2:-1]
+        # ExtVal is in raw format
+        ExtVal = str(Cert.get_extension(ExtNum).get_data())[2:-1]
+
+        ExtNameVal[ExtName] = ExtVal
+
+        ExtNum += 1
+
+    return ExtNameVal
+
+
 def PrintOutData(HostName, Port):
     '''Print out the results of ParseCert() function'''
     CertRaw = GetCert(HostName, Port)
 
     Out = ParseCert(CertRaw)
 
-    print(Out)
     print('Subject:\t{0}'.format(Out['CertSubject']))
     print('Start date:\t{0}'.format(Out['CertStartDate']))
     print('End date:\t{0}'.format(Out['CertEndDate']))
@@ -50,4 +71,16 @@ def PrintOutData(HostName, Port):
     else:
         print('Expired:\tNo')
 
+
+def PrintOutExtData(HostName, Port):
+    '''Print out the results of ParseCertExtension() function'''
+    CertRaw = GetCert(HostName, Port)
+
+    Out = ParseCertExtension(CertRaw)
+
+    for ExtName, ExtVal in Out.items():
+        print('{0}:\t{1}'.format(ExtName, ExtVal))
+
+
 PrintOutData('some.domain.tld', 443)
+PrintOutExtData('some.domain.tld', 443)
