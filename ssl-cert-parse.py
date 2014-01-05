@@ -2,13 +2,30 @@
 
 
 import datetime
-import ssl
 import OpenSSL
+import socket
 
 
 def GetCert(SiteName, Port):
     '''Connect to the specified host and get the certificate file'''
-    return ssl.get_server_certificate((SiteName, Port))
+    Client = socket.socket()
+    Client.connect((SiteName, Port))
+
+    ClientSSL = OpenSSL.SSL.Connection(OpenSSL.SSL.Context(
+                                       OpenSSL.SSL.SSLv3_METHOD), Client)
+    ClientSSL.set_connect_state()
+    ClientSSL.do_handshake()
+
+    CertDataRaw = str(OpenSSL.crypto.dump_certificate(
+                      OpenSSL.crypto.FILETYPE_PEM,
+                      ClientSSL.get_peer_certificate()))[2:-1]
+    CertData = CertDataRaw.split('\\n')
+    Cert = ""
+
+    for line in CertData:
+        Cert += line + '\n'
+
+    return Cert
 
 
 def ParseCert(CertRaw):
