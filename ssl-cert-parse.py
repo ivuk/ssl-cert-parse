@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
 
+import argparse
 import datetime
 import OpenSSL
 import socket
+import sys
 
 
 def GetCert(SiteName, Port):
@@ -99,5 +101,55 @@ def PrintOutExtData(HostName, Port):
         print('{0}:\t{1}'.format(ExtName, ExtVal))
 
 
-PrintOutData('some.domain.tld', 443)
-PrintOutExtData('some.domain.tld', 443)
+def PrintOutDataTerse(HostName, Port):
+    '''Print out the results of ParseCert() function'''
+    CertRaw = GetCert(HostName, Port)
+
+    Out = ParseCert(CertRaw)
+
+    print('Start date:\t{0}'.format(Out['CertStartDate']))
+    print('End date:\t{0}'.format(Out['CertEndDate']))
+
+
+def DoIt():
+    """
+    Set up the available program options
+    Call the proper functions with proper parameters depending on user
+    input
+    """
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-a', '--all', dest='All',
+                        help='Show the entire output', action='store_true')
+    parser.add_argument('-b', '--basic', dest='Basic',
+                        help='Show the basic data output',
+                        action='store_true')
+    parser.add_argument('-d', '--dest', dest='HostName',
+                        help='Set the hostname to connect to', type=str,
+                        action='store')
+    parser.add_argument('-e', '--extended', dest='Extended',
+                        help='Show the extended data output',
+                        action='store_true')
+    parser.add_argument('-p', '--port', dest='Port',
+                        help='Set the port to connect to', default=443,
+                        type=int, action='store')
+
+    args = parser.parse_args()
+
+    if not args.HostName:
+        print("You must specify a hostname, use -d or --dest parameter")
+        sys.exit(14)
+
+    if args.All:
+        PrintOutData(args.HostName, args.Port)
+        PrintOutExtData(args.HostName, args.Port)
+    elif args.Basic:
+        PrintOutData(args.HostName, args.Port)
+    elif args.Extended:
+        PrintOutExtData(args.HostName, args.Port)
+    else:
+        PrintOutDataTerse(args.HostName, args.Port)
+
+
+if __name__ == "__main__":
+    DoIt()
