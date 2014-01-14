@@ -4,6 +4,7 @@
 import argparse
 import datetime
 import OpenSSL
+import os
 import socket
 import sys
 
@@ -28,6 +29,17 @@ def GetCert(SiteName, Port):
         Cert += line + '\n'
 
     return Cert
+
+
+def GetCertFile(FileName):
+    """
+    Load the data from a certificate file on disk if the file can be read
+    """
+    if os.path.isfile(FileName) and os.access(FileName, os.R_OK):
+        with open(FileName, 'rt') as File:
+            CertData = File.read()
+
+    return CertData
 
 
 def ParseCert(CertRaw):
@@ -73,9 +85,15 @@ def ParseCertExtension(CertRaw):
     return ExtNameVal
 
 
-def PrintOutData(HostName, Port):
+def PrintOutData(*args):
     '''Print out the results of ParseCert() function'''
-    CertRaw = GetCert(HostName, Port)
+    if len(args) == 1:
+        FileName = args[0]
+        CertRaw = GetCertFile(FileName)
+    else:
+        HostName = args[0]
+        Port = args[1]
+        CertRaw = GetCert(HostName, Port)
 
     Out = ParseCert(CertRaw)
 
@@ -91,9 +109,15 @@ def PrintOutData(HostName, Port):
         print('Expired:\tNo')
 
 
-def PrintOutExtData(HostName, Port):
+def PrintOutExtData(*args):
     '''Print out the results of ParseCertExtension() function'''
-    CertRaw = GetCert(HostName, Port)
+    if len(args) == 1:
+        FileName = args[0]
+        CertRaw = GetCertFile(FileName)
+    else:
+        HostName = args[0]
+        Port = args[1]
+        CertRaw = GetCert(HostName, Port)
 
     Out = ParseCertExtension(CertRaw)
 
@@ -101,9 +125,15 @@ def PrintOutExtData(HostName, Port):
         print('{0}:\t{1}'.format(ExtName, ExtVal))
 
 
-def PrintOutDataTerse(HostName, Port):
+def PrintOutDataTerse(*args):
     '''Print out the results of ParseCert() function'''
-    CertRaw = GetCert(HostName, Port)
+    if len(args) == 1:
+        FileName = args[0]
+        CertRaw = GetCertFile(FileName)
+    else:
+        HostName = args[0]
+        Port = args[1]
+        CertRaw = GetCert(HostName, Port)
 
     Out = ParseCert(CertRaw)
 
@@ -130,25 +160,39 @@ def DoIt():
     parser.add_argument('-e', '--extended', dest='Extended',
                         help='Show the extended data output',
                         action='store_true')
+    parser.add_argument('-f', '--file', dest='FileName',
+                        help='Set the file that contains the SSL certificate',
+                        type=str, action='store')
     parser.add_argument('-p', '--port', dest='Port',
                         help='Set the port to connect to', default=443,
                         type=int, action='store')
 
     args = parser.parse_args()
 
-    if not args.HostName:
+    if not args.HostName and not args.FileName:
         print("You must specify a hostname, use -d or --dest parameter")
         sys.exit(14)
 
-    if args.All:
-        PrintOutData(args.HostName, args.Port)
-        PrintOutExtData(args.HostName, args.Port)
-    elif args.Basic:
-        PrintOutData(args.HostName, args.Port)
-    elif args.Extended:
-        PrintOutExtData(args.HostName, args.Port)
-    else:
-        PrintOutDataTerse(args.HostName, args.Port)
+    if args.HostName:
+        if args.All:
+            PrintOutData(args.HostName, args.Port)
+            PrintOutExtData(args.HostName, args.Port)
+        elif args.Basic:
+            PrintOutData(args.HostName, args.Port)
+        elif args.Extended:
+            PrintOutExtData(args.HostName, args.Port)
+        else:
+            PrintOutDataTerse(args.HostName, args.Port)
+    elif args.FileName:
+        if args.All:
+            PrintOutData(args.FileName)
+            PrintOutExtData(args.FileName)
+        elif args.Basic:
+            PrintOutData(args.FileName)
+        elif args.Extended:
+            PrintOutExtData(args.FileName)
+        else:
+            PrintOutDataTerse(args.FileName)
 
 
 if __name__ == "__main__":
