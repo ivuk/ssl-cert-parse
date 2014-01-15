@@ -6,7 +6,6 @@ import datetime
 import OpenSSL
 import os
 import socket
-import sys
 
 
 def GetCert(SiteName, Port):
@@ -170,8 +169,7 @@ def DoIt():
     args = parser.parse_args()
 
     if not args.HostName and not args.FileName:
-        print("You must specify a hostname, use -d or --dest parameter")
-        sys.exit(14)
+        parser.print_help()
 
     if args.HostName:
         if args.All:
