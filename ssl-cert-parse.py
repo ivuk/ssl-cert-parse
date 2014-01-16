@@ -11,6 +11,7 @@ import socket
 def GetCert(SiteName, Port):
     '''Connect to the specified host and get the certificate file'''
     Client = socket.socket()
+    Client.settimeout(10)
     Client.connect((SiteName, Port))
 
     ClientSSL = OpenSSL.SSL.Connection(OpenSSL.SSL.Context(
