@@ -12,7 +12,11 @@ def GetCert(SiteName, Port):
     '''Connect to the specified host and get the certificate file'''
     Client = socket.socket()
     Client.settimeout(10)
-    Client.connect((SiteName, Port))
+    try:
+        Client.connect((SiteName, Port))
+    except socket.gaierror as e:
+        print('Error connecting to server: {0}'.format(e))
+        exit(14)
 
     ClientSSL = OpenSSL.SSL.Connection(OpenSSL.SSL.Context(
                                        OpenSSL.SSL.SSLv3_METHOD), Client)
