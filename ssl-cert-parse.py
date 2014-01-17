@@ -21,7 +21,11 @@ def GetCert(SiteName, Port):
     ClientSSL = OpenSSL.SSL.Connection(OpenSSL.SSL.Context(
                                        OpenSSL.SSL.SSLv3_METHOD), Client)
     ClientSSL.set_connect_state()
-    ClientSSL.do_handshake()
+    try:
+        ClientSSL.do_handshake()
+    except OpenSSL.SSL.WantReadError as e:
+        print('Error trying to establish an SSL connection: {0}'.format(e))
+        exit(14)
 
     CertDataRaw = str(OpenSSL.crypto.dump_certificate(
                       OpenSSL.crypto.FILETYPE_PEM,
