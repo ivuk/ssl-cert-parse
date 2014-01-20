@@ -11,7 +11,7 @@ import socket
 def GetCert(SiteName, Port):
     '''Connect to the specified host and get the certificate file'''
     Client = socket.socket()
-    Client.settimeout(10)
+    Client.settimeout(None)
     try:
         Client.connect((SiteName, Port))
     except socket.gaierror as e:
