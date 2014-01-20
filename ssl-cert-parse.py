@@ -64,11 +64,12 @@ def ParseCert(CertRaw):
     CertEndDate = datetime.datetime.strptime(str(Cert.get_notAfter())[2:-1],
                                              '%Y%m%d%H%M%SZ')
     CertIssuer = str(Cert.get_issuer())[18:-2]
+    DaysRemaining = (CertEndDate - datetime.datetime.now()).days
 
     return {'CertSubject': CertSubject, 'CertStartDate': CertStartDate,
             'CertEndDate': CertEndDate, 'CertIssuer': CertIssuer,
             'CertSigAlgo': CertSigAlgo, 'CertExpired': CertExpired,
-            'CertVersion': CertVersion}
+            'CertVersion': CertVersion, 'DaysRemaining': DaysRemaining}
 
 
 def ParseCertExtension(CertRaw):
@@ -115,6 +116,10 @@ def PrintOutData(*args):
         print('Expired:\tYes')
     else:
         print('Expired:\tNo')
+    if Out['DaysRemaining'] == 1:
+        print('Expires in:\t{0} day'.format(Out['DaysRemaining']))
+    elif Out['DaysRemaining'] >= 0:
+        print('Expires in:\t{0} days'.format(Out['DaysRemaining']))
 
 
 def PrintOutExtData(*args):
@@ -147,6 +152,10 @@ def PrintOutDataTerse(*args):
 
     print('Start date:\t{0}'.format(Out['CertStartDate']))
     print('End date:\t{0}'.format(Out['CertEndDate']))
+    if Out['DaysRemaining'] == 1:
+        print('Expires in:\t{0} day'.format(Out['DaysRemaining']))
+    elif Out['DaysRemaining'] >= 0:
+        print('Expires in:\t{0} days'.format(Out['DaysRemaining']))
 
 
 def DoIt():
