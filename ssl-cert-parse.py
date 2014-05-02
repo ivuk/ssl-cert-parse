@@ -9,7 +9,9 @@ import socket
 
 
 def GetCert(SiteName, Port):
-    '''Connect to the specified host and get the certificate file'''
+    """
+    Connect to the specified host and get the certificate file
+    """
     Client = socket.socket()
     Client.settimeout(None)
     try:
@@ -51,7 +53,9 @@ def GetCertFile(FileName):
 
 
 def ParseCert(CertRaw):
-    '''Parse the available data from the certificate file'''
+    """
+    Parse the available data from the certificate file
+    """
     Cert = OpenSSL.crypto.load_certificate(
         OpenSSL.crypto.FILETYPE_PEM, CertRaw)
 
@@ -73,7 +77,9 @@ def ParseCert(CertRaw):
 
 
 def ParseCertExtension(CertRaw):
-    '''Parse the available extension data from the certificate file'''
+    """
+    Parse the available extension data from the certificate file
+    """
     Cert = OpenSSL.crypto.load_certificate(
         OpenSSL.crypto.FILETYPE_PEM, CertRaw)
 
@@ -95,7 +101,9 @@ def ParseCertExtension(CertRaw):
 
 
 def PrintOutData(*args):
-    '''Print out the results of ParseCert() function'''
+    """
+    Print out the results of ParseCert() function
+    """
     if len(args) == 1:
         FileName = args[0]
         CertRaw = GetCertFile(FileName)
@@ -123,7 +131,9 @@ def PrintOutData(*args):
 
 
 def PrintOutExtData(*args):
-    '''Print out the results of ParseCertExtension() function'''
+    """
+    Print out the results of ParseCertExtension() function
+    """
     if len(args) == 1:
         FileName = args[0]
         CertRaw = GetCertFile(FileName)
@@ -139,7 +149,9 @@ def PrintOutExtData(*args):
 
 
 def PrintOutDataTerse(*args):
-    '''Print out the results of ParseCert() function'''
+    """
+    Print out the results of ParseCert() function
+    """
     if len(args) == 1:
         FileName = args[0]
         CertRaw = GetCertFile(FileName)
