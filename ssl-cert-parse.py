@@ -33,10 +33,7 @@ def GetCert(SiteName, Port):
                       OpenSSL.crypto.FILETYPE_PEM,
                       ClientSSL.get_peer_certificate()))[2:-1]
     CertData = CertDataRaw.split('\\n')
-    Cert = ""
-
-    for line in CertData:
-        Cert += line + '\n'
+    Cert = '\n'.join(CertData)
 
     return Cert
 
