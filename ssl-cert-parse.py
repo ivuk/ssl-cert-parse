@@ -21,7 +21,7 @@ def GetCert(SiteName, Port):
         exit(14)
 
     ClientSSL = OpenSSL.SSL.Connection(OpenSSL.SSL.Context(
-                                       OpenSSL.SSL.SSLv3_METHOD), Client)
+                                       OpenSSL.SSL.TLSv1_METHOD), Client)
     ClientSSL.set_connect_state()
     try:
         ClientSSL.do_handshake()
