@@ -17,23 +17,26 @@ def GetCert(SiteName, Port):
     try:
         Client.connect((SiteName, Port))
     except socket.gaierror as e:
-        print('Error connecting to server: {0}'.format(e))
+        print("Error connecting to server: {0}".format(e))
         exit(14)
 
-    ClientSSL = OpenSSL.SSL.Connection(OpenSSL.SSL.Context(
-                                       OpenSSL.SSL.TLSv1_2_METHOD), Client)
+    ClientSSL = OpenSSL.SSL.Connection(
+        OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_2_METHOD), Client
+    )
     ClientSSL.set_connect_state()
     try:
         ClientSSL.do_handshake()
     except OpenSSL.SSL.WantReadError as e:
-        print('Error trying to establish an SSL connection: {0}'.format(e))
+        print("Error trying to establish an SSL connection: {0}".format(e))
         exit(14)
 
-    CertDataRaw = str(OpenSSL.crypto.dump_certificate(
-                      OpenSSL.crypto.FILETYPE_PEM,
-                      ClientSSL.get_peer_certificate()))[2:-1]
-    CertData = CertDataRaw.split('\\n')
-    Cert = '\n'.join(CertData)
+    CertDataRaw = str(
+        OpenSSL.crypto.dump_certificate(
+            OpenSSL.crypto.FILETYPE_PEM, ClientSSL.get_peer_certificate()
+        )
+    )[2:-1]
+    CertData = CertDataRaw.split("\\n")
+    Cert = "\n".join(CertData)
 
     return Cert
 
@@ -43,7 +46,7 @@ def GetCertFile(FileName):
     Load the data from a certificate file on disk if the file can be read
     """
     if os.path.isfile(FileName) and os.access(FileName, os.R_OK):
-        with open(FileName, 'rt') as File:
+        with open(FileName, "rt") as File:
             CertData = File.read()
 
     return CertData
@@ -53,34 +56,40 @@ def ParseCert(CertRaw):
     """
     Parse the available data from the certificate file
     """
-    Cert = OpenSSL.crypto.load_certificate(
-        OpenSSL.crypto.FILETYPE_PEM, CertRaw)
+    Cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, CertRaw)
 
     CertExpired = Cert.has_expired()
     CertVersion = Cert.get_version()
     CertSigAlgo = str(Cert.get_signature_algorithm())[2:-1]
     CertSubject = str(Cert.get_subject())[18:-2]
-    CertStartDate = datetime.datetime.strptime(str(Cert.get_notBefore())[2:-1],
-                                               '%Y%m%d%H%M%SZ')
-    CertEndDate = datetime.datetime.strptime(str(Cert.get_notAfter())[2:-1],
-                                             '%Y%m%d%H%M%SZ')
+    CertStartDate = datetime.datetime.strptime(
+        str(Cert.get_notBefore())[2:-1], "%Y%m%d%H%M%SZ"
+    )
+    CertEndDate = datetime.datetime.strptime(
+        str(Cert.get_notAfter())[2:-1], "%Y%m%d%H%M%SZ"
+    )
     CertIssuer = str(Cert.get_issuer())[18:-2]
     DaysRemaining = (CertEndDate - datetime.datetime.now()).days
 
-    return {'CertSubject': CertSubject, 'CertStartDate': CertStartDate,
-            'CertEndDate': CertEndDate, 'CertIssuer': CertIssuer,
-            'CertSigAlgo': CertSigAlgo, 'CertExpired': CertExpired,
-            'CertVersion': CertVersion, 'DaysRemaining': DaysRemaining}
+    return {
+        "CertSubject": CertSubject,
+        "CertStartDate": CertStartDate,
+        "CertEndDate": CertEndDate,
+        "CertIssuer": CertIssuer,
+        "CertSigAlgo": CertSigAlgo,
+        "CertExpired": CertExpired,
+        "CertVersion": CertVersion,
+        "DaysRemaining": DaysRemaining,
+    }
 
 
 def ParseCertExtension(CertRaw):
     """
     Parse the available extension data from the certificate file
     """
-    Cert = OpenSSL.crypto.load_certificate(
-        OpenSSL.crypto.FILETYPE_PEM, CertRaw)
+    Cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, CertRaw)
 
-    print('Number of extensions:\t{0}'.format(Cert.get_extension_count()))
+    print("Number of extensions:\t{0}".format(Cert.get_extension_count()))
 
     ExtNum = 0
     ExtNameVal = dict()
@@ -111,20 +120,20 @@ def PrintOutData(*args):
 
     Out = ParseCert(CertRaw)
 
-    print('Subject:\t{0}'.format(Out['CertSubject']))
-    print('Start date:\t{0}'.format(Out['CertStartDate']))
-    print('End date:\t{0}'.format(Out['CertEndDate']))
-    print('Issuer:\t\t{0}'.format(Out['CertIssuer']))
-    print('Algorithm:\t{0}'.format(Out['CertSigAlgo']))
-    print('Version:\t{0}'.format(Out['CertVersion']))
-    if Out['CertExpired']:
-        print('Expired:\tYes')
+    print("Subject:\t{0}".format(Out["CertSubject"]))
+    print("Start date:\t{0}".format(Out["CertStartDate"]))
+    print("End date:\t{0}".format(Out["CertEndDate"]))
+    print("Issuer:\t\t{0}".format(Out["CertIssuer"]))
+    print("Algorithm:\t{0}".format(Out["CertSigAlgo"]))
+    print("Version:\t{0}".format(Out["CertVersion"]))
+    if Out["CertExpired"]:
+        print("Expired:\tYes")
     else:
-        print('Expired:\tNo')
-    if Out['DaysRemaining'] == 1:
-        print('Expires in:\t{0} day'.format(Out['DaysRemaining']))
-    elif Out['DaysRemaining'] >= 0:
-        print('Expires in:\t{0} days'.format(Out['DaysRemaining']))
+        print("Expired:\tNo")
+    if Out["DaysRemaining"] == 1:
+        print("Expires in:\t{0} day".format(Out["DaysRemaining"]))
+    elif Out["DaysRemaining"] >= 0:
+        print("Expires in:\t{0} days".format(Out["DaysRemaining"]))
 
 
 def PrintOutExtData(*args):
@@ -142,7 +151,7 @@ def PrintOutExtData(*args):
     Out = ParseCertExtension(CertRaw)
 
     for ExtName, ExtVal in Out.items():
-        print('{0}:\t{1}'.format(ExtName, ExtVal))
+        print("{0}:\t{1}".format(ExtName, ExtVal))
 
 
 def PrintOutDataTerse(*args):
@@ -159,12 +168,12 @@ def PrintOutDataTerse(*args):
 
     Out = ParseCert(CertRaw)
 
-    print('Start date:\t{0}'.format(Out['CertStartDate']))
-    print('End date:\t{0}'.format(Out['CertEndDate']))
-    if Out['DaysRemaining'] == 1:
-        print('Expires in:\t{0} day'.format(Out['DaysRemaining']))
-    elif Out['DaysRemaining'] >= 0:
-        print('Expires in:\t{0} days'.format(Out['DaysRemaining']))
+    print("Start date:\t{0}".format(Out["CertStartDate"]))
+    print("End date:\t{0}".format(Out["CertEndDate"]))
+    if Out["DaysRemaining"] == 1:
+        print("Expires in:\t{0} day".format(Out["DaysRemaining"]))
+    elif Out["DaysRemaining"] >= 0:
+        print("Expires in:\t{0} days".format(Out["DaysRemaining"]))
 
 
 def DoIt():
@@ -175,23 +184,48 @@ def DoIt():
     """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-a', '--all', dest='All',
-                        help='Show the entire output', action='store_true')
-    parser.add_argument('-b', '--basic', dest='Basic',
-                        help='Show the basic data output',
-                        action='store_true')
-    parser.add_argument('-d', '--dest', dest='HostName',
-                        help='Set the hostname to connect to', type=str,
-                        action='store')
-    parser.add_argument('-e', '--extended', dest='Extended',
-                        help='Show the extended data output',
-                        action='store_true')
-    parser.add_argument('-f', '--file', dest='FileName',
-                        help='Set the file that contains the SSL certificate',
-                        type=str, action='store')
-    parser.add_argument('-p', '--port', dest='Port',
-                        help='Set the port to connect to', default=443,
-                        type=int, action='store')
+    parser.add_argument(
+        "-a", "--all", dest="All", help="Show the entire output", action="store_true"
+    )
+    parser.add_argument(
+        "-b",
+        "--basic",
+        dest="Basic",
+        help="Show the basic data output",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-d",
+        "--dest",
+        dest="HostName",
+        help="Set the hostname to connect to",
+        type=str,
+        action="store",
+    )
+    parser.add_argument(
+        "-e",
+        "--extended",
+        dest="Extended",
+        help="Show the extended data output",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-f",
+        "--file",
+        dest="FileName",
+        help="Set the file that contains the SSL certificate",
+        type=str,
+        action="store",
+    )
+    parser.add_argument(
+        "-p",
+        "--port",
+        dest="Port",
+        help="Set the port to connect to",
+        default=443,
+        type=int,
+        action="store",
+    )
 
     args = parser.parse_args()
 
