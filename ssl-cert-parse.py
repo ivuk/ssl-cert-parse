@@ -69,7 +69,16 @@ def ParseCert(CertRaw):
     Cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, CertRaw)
 
     CertExpired = Cert.has_expired()
-    CertVersion = Cert.get_version()
+    CertVersionValue = Cert.get_version()
+
+    # Set the version of the certificate according to RFC 2459, section 4.1.2.1
+    if CertVersionValue == 2:
+        CertVersion = 3
+    elif CertVersionValue == 1:
+        CertVersion = 2
+    else:
+        CertVersion = 1
+
     CertSigAlgo = str(Cert.get_signature_algorithm())[2:-1]
     CertSubject = str(Cert.get_subject())[18:-2]
     CertStartDate = datetime.datetime.strptime(
