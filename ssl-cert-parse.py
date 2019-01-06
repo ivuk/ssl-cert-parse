@@ -20,15 +20,18 @@ def GetCert(SiteName, Port, Protocol):
         print("Error connecting to server: {0}".format(err))
         exit(14)
 
-    if Protocol == 'tls1_2':
+    if Protocol == "tls1_2":
         ClientSSL = OpenSSL.SSL.Connection(
-            OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_2_METHOD), Client)
-    elif Protocol == 'tls1_1':
+            OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_2_METHOD), Client
+        )
+    elif Protocol == "tls1_1":
         ClientSSL = OpenSSL.SSL.Connection(
-            OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_1_METHOD), Client)
-    elif Protocol == 'tls1':
+            OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_1_METHOD), Client
+        )
+    elif Protocol == "tls1":
         ClientSSL = OpenSSL.SSL.Connection(
-            OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_METHOD), Client)
+            OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_METHOD), Client
+        )
 
     ClientSSL.set_connect_state()
     try:
@@ -238,12 +241,13 @@ def DoIt():
     )
 
     parser.add_argument(
-        '-t',
-        '--tls-version',
-        dest='Protocol',
-        help='Set the protocol to use when connecting',
-        type=str, default='tls1_2',
-        choices=('tls1', 'tls1_1', 'tls1_2')
+        "-t",
+        "--tls-version",
+        dest="Protocol",
+        help="Set the protocol to use when connecting",
+        type=str,
+        default="tls1_2",
+        choices=("tls1", "tls1_1", "tls1_2"),
     )
 
     args = parser.parse_args()
