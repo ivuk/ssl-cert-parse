@@ -8,7 +8,7 @@ import socket
 import OpenSSL
 
 
-def GetCert(SiteName, Port):
+def GetCert(SiteName, Port, Protocol):
     """
     Connect to the specified host and get the certificate file
     """
@@ -20,9 +20,16 @@ def GetCert(SiteName, Port):
         print("Error connecting to server: {0}".format(err))
         exit(14)
 
-    ClientSSL = OpenSSL.SSL.Connection(
-        OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_2_METHOD), Client
-    )
+    if Protocol == 'tls1_2':
+        ClientSSL = OpenSSL.SSL.Connection(
+            OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_2_METHOD), Client)
+    elif Protocol == 'tls1_1':
+        ClientSSL = OpenSSL.SSL.Connection(
+            OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_1_METHOD), Client)
+    elif Protocol == 'tls1':
+        ClientSSL = OpenSSL.SSL.Connection(
+            OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_METHOD), Client)
+
     ClientSSL.set_connect_state()
     try:
         ClientSSL.do_handshake()
@@ -116,7 +123,8 @@ def PrintOutData(*args):
     else:
         HostName = args[0]
         Port = args[1]
-        CertRaw = GetCert(HostName, Port)
+        Protocol = args[2]
+        CertRaw = GetCert(HostName, Port, Protocol)
 
     Out = ParseCert(CertRaw)
 
@@ -146,7 +154,8 @@ def PrintOutExtData(*args):
     else:
         HostName = args[0]
         Port = args[1]
-        CertRaw = GetCert(HostName, Port)
+        Protocol = args[2]
+        CertRaw = GetCert(HostName, Port, Protocol)
 
     Out = ParseCertExtension(CertRaw)
 
@@ -164,7 +173,8 @@ def PrintOutDataTerse(*args):
     else:
         HostName = args[0]
         Port = args[1]
-        CertRaw = GetCert(HostName, Port)
+        Protocol = args[2]
+        CertRaw = GetCert(HostName, Port, Protocol)
 
     Out = ParseCert(CertRaw)
 
@@ -227,6 +237,15 @@ def DoIt():
         action="store",
     )
 
+    parser.add_argument(
+        '-t',
+        '--tls-version',
+        dest='Protocol',
+        help='Set the protocol to use when connecting',
+        type=str, default='tls1_2',
+        choices=('tls1', 'tls1_1', 'tls1_2')
+    )
+
     args = parser.parse_args()
 
     if not args.HostName and not args.FileName:
@@ -234,14 +253,14 @@ def DoIt():
 
     if args.HostName:
         if args.All:
-            PrintOutData(args.HostName, args.Port)
-            PrintOutExtData(args.HostName, args.Port)
+            PrintOutData(args.HostName, args.Port, args.Protocol)
+            PrintOutExtData(args.HostName, args.Port, args.Protocol)
         elif args.Basic:
-            PrintOutData(args.HostName, args.Port)
+            PrintOutData(args.HostName, args.Port, args.Protocol)
         elif args.Extended:
-            PrintOutExtData(args.HostName, args.Port)
+            PrintOutExtData(args.HostName, args.Port, args.Protocol)
         else:
-            PrintOutDataTerse(args.HostName, args.Port)
+            PrintOutDataTerse(args.HostName, args.Port, args.Protocol)
     elif args.FileName:
         if args.All:
             PrintOutData(args.FileName)
