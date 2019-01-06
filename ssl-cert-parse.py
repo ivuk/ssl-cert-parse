@@ -3,9 +3,9 @@
 
 import argparse
 import datetime
-import OpenSSL
 import os
 import socket
+import OpenSSL
 
 
 def GetCert(SiteName, Port):
@@ -16,8 +16,8 @@ def GetCert(SiteName, Port):
     Client.settimeout(None)
     try:
         Client.connect((SiteName, Port))
-    except socket.gaierror as e:
-        print("Error connecting to server: {0}".format(e))
+    except socket.gaierror as err:
+        print("Error connecting to server: {0}".format(err))
         exit(14)
 
     ClientSSL = OpenSSL.SSL.Connection(
@@ -26,8 +26,8 @@ def GetCert(SiteName, Port):
     ClientSSL.set_connect_state()
     try:
         ClientSSL.do_handshake()
-    except OpenSSL.SSL.WantReadError as e:
-        print("Error trying to establish an SSL connection: {0}".format(e))
+    except OpenSSL.SSL.Error as err:
+        print("Error trying to establish an SSL connection: {0}".format(err))
         exit(14)
 
     CertDataRaw = str(
